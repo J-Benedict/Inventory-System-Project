@@ -1,0 +1,49 @@
+Experiment: Testing Different Reorder Points (ROP) to find the optimal trade-off.
+--- Running Monte Carlo Simulation (100 Replications of 365 days) ---
+Testing Policy -> None
+
+--- Monte Carlo Results (Averages) ---
+Emergency Shortages : 0.6  (StdDev: 1.5)
+Scheduled Shortages : 61.8  (StdDev: 55.3)
+Total Shortages     : 62.3  (StdDev: 56.1)
+Total Spoilage      : 0.0  (StdDev: 0.0)
+Service Level       : 98.31% (StdDev: 1.49%)
+Spoilage Ratio      : 0.00% (StdDev: 0.00%)
+--------------------------------------
+
+--- Running Monte Carlo Simulation (100 Replications of 365 days) ---
+Testing Policy -> ROP: 10, OQ: 10
+
+--- Monte Carlo Results (Averages) ---
+Emergency Shortages : 0.0  (StdDev: 0.0)
+Scheduled Shortages : 0.0  (StdDev: 0.2)
+Total Shortages     : 0.0  (StdDev: 0.2)
+Total Spoilage      : 0.0  (StdDev: 0.0)
+Service Level       : 100.00% (StdDev: 0.00%)
+Spoilage Ratio      : 0.00% (StdDev: 0.00%)
+--------------------------------------
+
+--- Running Monte Carlo Simulation (100 Replications of 365 days) ---
+Testing Policy -> ROP: 20, OQ: 10
+
+--- Monte Carlo Results (Averages) ---
+Emergency Shortages : 0.0  (StdDev: 0.0)
+Scheduled Shortages : 0.0  (StdDev: 0.3)
+Total Shortages     : 0.0  (StdDev: 0.3)
+Total Spoilage      : 0.0  (StdDev: 0.0)
+Service Level       : 100.00% (StdDev: 0.01%)
+Spoilage Ratio      : 0.00% (StdDev: 0.00%)
+--------------------------------------
+
+--- Running Monte Carlo Simulation (100 Replications of 365 days) ---
+Testing Policy -> ROP: 40, OQ: 15
+
+--- Monte Carlo Results (Averages) ---
+Emergency Shortages : 0.0  (StdDev: 0.0)
+Scheduled Shortages : 0.0  (StdDev: 0.1)
+Total Shortages     : 0.0  (StdDev: 0.1)
+Total Spoilage      : 0.0  (StdDev: 0.0)
+Service Level       : 100.00% (StdDev: 0.00%)
+Spoilage Ratio      : 0.00% (StdDev: 0.00%)
+--------------------------------------
+

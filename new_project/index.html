@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lakano's Medical Center Blood Bank Dashboard</title>
+    <!-- Modern Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Chart.js for visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            /* Deep modern slate background */
+            --panel-bg: #1e293b;
+            /* Slightly lighter for cards */
+            --text-main: #f8fafc;
+            /* Crisp white */
+            --text-muted: #94a3b8;
+            /* Dimmed text */
+
+            /* Thematic Accents */
+            --accent-blood: #ef4444;
+            /* Alert Red */
+            --accent-blood-hover: #b91c1c;
+            --accent-blue: #3b82f6;
+            /* Medical / Tech Blue */
+            --accent-success: #10b981;
+            /* Good status */
+
+            --border-radius: 12px;
+            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.25);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin: 0;
+            background: linear-gradient(to right, var(--accent-blood), #fca5a5);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.05em;
+        }
+
+        .header p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            margin-top: 0.5rem;
+        }
+
+        .dashboard-container {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 2rem;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        /* Control Panel */
+        .control-panel {
+            background-color: var(--panel-bg);
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            animation: fadeInLeft 0.8s ease-out;
+        }
+
+        .control-panel h2 {
+            margin-top: 0;
+            font-size: 1.25rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 0.75rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .input-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .header-label {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .slider-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 4px;
+        }
+
+        .slider-row input[type="range"] {
+            flex-grow: 1;
+            width: 100%;
+            -webkit-appearance: none;
+            appearance: none;
+            background: linear-gradient(to right, var(--accent-blue) 0%, var(--accent-blue) 50%, #e2e8f0 50%, #e2e8f0 100%);
+            height: 6px;
+            border-radius: 3px;
+            outline: none;
+            margin: 0;
+            cursor: pointer;
+        }
+
+        .slider-row input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--accent-blue);
+            cursor: pointer;
+            box-shadow: 0 0 0 2px var(--panel-bg);
+        }
+
+        .slider-row input[type="range"]::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--accent-blue);
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 0 0 2px var(--panel-bg);
+        }
+
+        .value-display {
+            font-weight: 700;
+            color: var(--accent-blue);
+        }
+
+        input.value-display {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            width: 44px;
+            height: 44px;
+            text-align: center;
+            padding: 0;
+            font-family: inherit;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+        }
+
+        input.value-display::-webkit-outer-spin-button,
+        input.value-display::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        input.value-display[type=number] {
+            -moz-appearance: textfield;
+            appearance: textfield;
+        }
+
+        /* Toggle specifically for ROP policy */
+        .policy-group {
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px dashed rgba(255, 255, 255, 0.1);
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .checkbox-label input {
+            width: 18px;
+            height: 18px;
+            margin-right: 10px;
+            accent-color: var(--accent-blood);
+        }
+
+        button {
+            width: 100%;
+            background: linear-gradient(135deg, var(--accent-blood), var(--accent-blood-hover));
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 1.5rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 14px 0 rgba(239, 68, 68, 0.39);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px 0 rgba(239, 68, 68, 0.5);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        /* Results Area */
+        .results-area {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            animation: fadeInRight 0.8s ease-out;
+        }
+
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .kpi-card {
+            background-color: var(--panel-bg);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .kpi-card h3 {
+            margin: 0;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+        }
+
+        .kpi-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin: 0.5rem 0 0.25rem 0;
+        }
+
+        .kpi-subtext {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        /* Specific KPI Colors */
+        .kpi-shortage .kpi-value {
+            color: var(--accent-blood);
+        }
+
+        .kpi-spoilage .kpi-value {
+            color: #f59e0b;
+        }
+
+        /* Warning Orange */
+        .kpi-service .kpi-value {
+            color: var(--accent-success);
+        }
+
+
+        .chart-container {
+            background-color: var(--panel-bg);
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            height: 400px;
+            position: relative;
+        }
+
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(30, 41, 59, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: var(--border-radius);
+            backdrop-filter: blur(4px);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            z-index: 10;
+        }
+
+        .loading-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(239, 68, 68, 0.3);
+            border-top-color: var(--accent-blood);
+            border-radius: 50%;
+            animation: spin 1s infinite linear;
+        }
+
+        @keyframes spin {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes fadeInRight {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header">
+        <h1>Lakano's Medical Center Blood Bank</h1>
+        <p>Monte Carlo Analysis for Inventory Optimization</p>
+    </div>
+
+    <div class="dashboard-container">
+
+        <!-- CONTROL PANEL -->
+        <div class="control-panel">
+            <h2>⚙️ System Parameters</h2>
+
+            <div class="input-group">
+                <div class="header-label">
+                    <label>Average Daily Donations</label>
+                </div>
+                <div class="slider-row">
+                    <input type="range" id="avg-donations" min="1" max="50" value="10"
+                        oninput="document.getElementById('val-donations').value = this.value; updateSliderFill(this)">
+                    <input type="number" class="value-display" id="val-donations" value="10"
+                        oninput="document.getElementById('avg-donations').value = this.value; updateSliderFill(document.getElementById('avg-donations'))">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <div class="header-label">
+                    <label>Avg. Scheduled Operations (Demand)</label>
+                </div>
+                <div class="slider-row">
+                    <input type="range" id="avg-sched" min="1" max="40" value="7"
+                        oninput="document.getElementById('val-sched').value = this.value; updateSliderFill(this)">
+                    <input type="number" class="value-display" id="val-sched" value="7"
+                        oninput="document.getElementById('avg-sched').value = this.value; updateSliderFill(document.getElementById('avg-sched'))">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <div class="header-label">
+                    <label>Avg. Emergency Trauma (Priority Demand)</label>
+                </div>
+                <div class="slider-row">
+                    <input type="range" id="avg-emer" min="0" max="20" value="3"
+                        oninput="document.getElementById('val-emer').value = this.value; updateSliderFill(this)">
+                    <input type="number" class="value-display" id="val-emer" value="3"
+                        oninput="document.getElementById('avg-emer').value = this.value; updateSliderFill(document.getElementById('avg-emer'))">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <div class="header-label">
+                    <label>Maximum Shelf Life (Days)</label>
+                </div>
+                <div class="slider-row">
+                    <input type="range" id="max-life" min="15" max="60" value="35"
+                        oninput="document.getElementById('val-life').value = this.value; updateSliderFill(this)">
+                    <input type="number" class="value-display" id="val-life" value="35"
+                        oninput="document.getElementById('max-life').value = this.value; updateSliderFill(document.getElementById('max-life'))">
+                </div>
+            </div>
+
+            <div class="policy-group">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="use-policy"> Enable Inventory Policy
+                </label>
+
+                <div id="policy-inputs" style="opacity: 0.5; pointer-events: none; transition: 0.3s;">
+                    <div class="input-group">
+                        <div class="header-label">
+                            <label>Reorder Point (ROP)</label>
+                        </div>
+                        <div class="slider-row">
+                            <input type="range" id="input-rop" min="5" max="100" value="15"
+                                oninput="document.getElementById('val-rop').value = this.value; updateSliderFill(this)">
+                            <input type="number" class="value-display" id="val-rop" value="15"
+                                oninput="document.getElementById('input-rop').value = this.value; updateSliderFill(document.getElementById('input-rop'))">
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <div class="header-label">
+                            <label>Order Quantity (Emergency Drive)</label>
+                        </div>
+                        <div class="slider-row">
+                            <input type="range" id="input-oq" min="1" max="50" value="10"
+                                oninput="document.getElementById('val-oq').value = this.value; updateSliderFill(this)">
+                            <input type="number" class="value-display" id="val-oq" value="10"
+                                oninput="document.getElementById('input-oq').value = this.value; updateSliderFill(document.getElementById('input-oq'))">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button onclick="runSimulation()">▶️ Run Simulation (1 Year)</button>
+        </div>
+
+        <!-- RESULTS AREA -->
+        <div class="results-area">
+
+            <div class="kpi-grid">
+                <div class="kpi-card kpi-shortage">
+                    <h3>Total Annual Shortages</h3>
+                    <div class="kpi-value" id="kpi-shortage">--</div>
+                    <div class="kpi-subtext">Patients unable to receive blood</div>
+                </div>
+
+                <div class="kpi-card kpi-spoilage">
+                    <h3>Spoiled Units</h3>
+                    <div class="kpi-value" id="kpi-spoilage">--</div>
+                    <div class="kpi-subtext">Blood expired before use</div>
+                </div>
+
+                <div class="kpi-card kpi-service">
+                    <h3>Service Level</h3>
+                    <div class="kpi-value" id="kpi-service">--%</div>
+                    <div class="kpi-subtext">Percentage of all demand met</div>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <div class="loading-overlay" id="loading">
+                    <div class="spinner"></div>
+                </div>
+                <canvas id="resultsChart"></canvas>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // Dynamic Slider Fill Function
+        function updateSliderFill(slider) {
+            const min = slider.min ? parseFloat(slider.min) : 0;
+            const max = slider.max ? parseFloat(slider.max) : 100;
+            const val = parseFloat(slider.value);
+            const percentage = ((val - min) / (max - min)) * 100;
+            slider.style.background = `linear-gradient(to right, var(--accent-blue) 0%, var(--accent-blue) ${percentage}%, #e2e8f0 ${percentage}%, #e2e8f0 100%)`;
+        }
+
+        // Initialize all slider fills
+        document.querySelectorAll('input[type="range"]').forEach(slider => {
+            updateSliderFill(slider);
+        });
+
+        // Toggle Policy Inputs
+        document.getElementById('use-policy').addEventListener('change', function () {
+            const panel = document.getElementById('policy-inputs');
+            if (this.checked) {
+                panel.style.opacity = '1';
+                panel.style.pointerEvents = 'all';
+            } else {
+                panel.style.opacity = '0.5';
+                panel.style.pointerEvents = 'none';
+            }
+        });
+
+        // Initialize Chart.js
+        const ctx = document.getElementById('resultsChart').getContext('2d');
+        let resultsChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Emergency Shortages', 'Scheduled Shortages', 'Total Spoilage'],
+                datasets: [{
+                    label: 'Units Per Year',
+                    data: [0, 0, 0],
+                    backgroundColor: [
+                        'rgba(239, 68, 68, 0.8)',   // Red for Emergency Shortage
+                        'rgba(245, 158, 11, 0.8)',  // Orange for Scheduled Shortage
+                        'rgba(148, 163, 184, 0.8)'  // Gray for Spoilage
+                    ],
+                    borderWidth: 0,
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    title: {
+                        display: true,
+                        text: 'Annual Trade-off: Shortage vs. Spoilage',
+                        color: '#f8fafc',
+                        font: { size: 16, family: 'Inter', weight: 'bold' }
+                    }
+                },
+                scales: {
+                    y: {
+                        grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                        ticks: { color: '#94a3b8' }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: '#e2e8f0', font: { weight: '600' } }
+                    }
+                }
+            }
+        });
+
+        // Fetch mechanism
+        async function runSimulation() {
+            // Show loading
+            document.getElementById('loading').classList.add('active');
+
+            // Gather inputs
+            const payload = {
+                replications: 1, // Changed to 1 year
+                days: 365,
+                max_shelf_life: parseInt(document.getElementById('val-life').value),
+                avg_donations: parseInt(document.getElementById('val-donations').value),
+                avg_sched_demand: parseInt(document.getElementById('val-sched').value),
+                avg_emer_demand: parseInt(document.getElementById('val-emer').value),
+            };
+
+            if (document.getElementById('use-policy').checked) {
+                payload.reorder_point = parseInt(document.getElementById('val-rop').value);
+                payload.order_quantity = parseInt(document.getElementById('val-oq').value);
+            }
+
+            try {
+                const response = await fetch('http://127.0.0.1:8080/simulate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+
+                // Update KPIs
+                // document.getElementById('kpi-shortage').innerText = data.total_shortages.toFixed(1);
+                // Animate numbers
+                animateValue("kpi-shortage", data.total_shortages.toFixed(1));
+                animateValue("kpi-spoilage", data.total_spoilage.toFixed(1));
+
+                const serviceElement = document.getElementById('kpi-service');
+                serviceElement.innerText = data.service_level.toFixed(2) + '%';
+
+                // Color code the service level
+                if (data.service_level >= 99) serviceElement.style.color = 'var(--accent-success)';
+                else if (data.service_level >= 95) serviceElement.style.color = '#f59e0b';
+                else serviceElement.style.color = 'var(--accent-blood)';
+
+                // Update Chart
+                resultsChart.data.datasets[0].data = [
+                    data.emergency_shortages,
+                    data.scheduled_shortages,
+                    data.total_spoilage
+                ];
+                resultsChart.update();
+
+            } catch (err) {
+                console.error("Simulation failed:", err);
+                alert("Failed to connect to the simulation engine. Ensure api.py is running on port 8000.");
+            } finally {
+                // Hide loading
+                document.getElementById('loading').classList.remove('active');
+            }
+        }
+
+        function animateValue(id, end) {
+            const obj = document.getElementById(id);
+            obj.innerHTML = end;
+        }
+
+        // Run once on load to show a baseline
+        setTimeout(runSimulation, 500);
+
+    </script>
+</body>
+
+</html>
