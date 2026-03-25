@@ -4,323 +4,716 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lakano's Medical Center Blood Bank Dashboard</title>
+    <title>Medical Center Blood Bank Dashboard</title>
     <!-- Modern Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <!-- Chart.js for visualization -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
-            --bg-color: #0f172a;
-            /* Deep modern slate background */
-            --panel-bg: #1e293b;
-            /* Slightly lighter for cards */
-            --text-main: #f8fafc;
-            /* Crisp white */
-            --text-muted: #94a3b8;
-            /* Dimmed text */
-
-            /* Thematic Accents */
-            --accent-blood: #ef4444;
-            /* Alert Red */
-            --accent-blood-hover: #b91c1c;
-            --accent-blue: #3b82f6;
-            /* Medical / Tech Blue */
+            /* Modern Color Palette */
+            --bg-primary: #0a0f1a;
+            --bg-secondary: #111827;
+            --bg-tertiary: #1f2937;
+            --bg-glass: rgba(17, 24, 39, 0.7);
+            --bg-glass-light: rgba(255, 255, 255, 0.03);
+            
+            /* Text Colors */
+            --text-primary: #ffffff;
+            --text-secondary: #e5e7eb;
+            --text-muted: #9ca3af;
+            --text-accent: #f9fafb;
+            
+            /* Accent Colors */
+            --accent-primary: #ef4444;
+            --accent-primary-hover: #dc2626;
+            --accent-primary-glow: rgba(239, 68, 68, 0.4);
+            --accent-secondary: #3b82f6;
+            --accent-secondary-hover: #2563eb;
+            --accent-secondary-glow: rgba(59, 130, 246, 0.4);
             --accent-success: #10b981;
-            /* Good status */
+            --accent-success-glow: rgba(16, 185, 129, 0.3);
+            --accent-warning: #f59e0b;
+            --accent-warning-glow: rgba(245, 158, 11, 0.3);
+            
+            /* Status Colors */
+            --status-info-bg: rgba(59, 130, 246, 0.15);
+            --status-success-bg: rgba(16, 185, 129, 0.15);
+            --status-error-bg: rgba(239, 68, 68, 0.15);
+            
+            /* Borders & Shadows */
+            --border-subtle: rgba(255, 255, 255, 0.08);
+            --border-light: rgba(255, 255, 255, 0.12);
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.4);
+            --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.5);
+            --shadow-glow: 0 0 40px rgba(239, 68, 68, 0.15);
+            
+            /* Spacing */
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+            
+            /* Transitions */
+            --transition-fast: 0.15s ease;
+            --transition-normal: 0.25s ease;
+            --transition-slow: 0.4s ease;
+        }
 
-            --border-radius: 12px;
-            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.25);
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            margin: 0;
-            padding: 2rem;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
             min-height: 100vh;
+            line-height: 1.6;
+            overflow-x: hidden;
         }
 
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-muted);
+        }
+
+        /* Animated Background */
+        .background-gradient {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(ellipse at 20% 0%, rgba(239, 68, 68, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 100%, rgba(59, 130, 246, 0.12) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(16, 185, 129, 0.08) 0%, transparent 60%),
+                var(--bg-primary);
+            z-index: -1;
+            animation: gradientShift 20s ease-in-out infinite alternate;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        /* Skip Link */
+        .skip-link {
+            position: absolute;
+            top: -100px;
+            left: 1rem;
+            z-index: 1000;
+            background: var(--accent-secondary);
+            color: white;
+            padding: 0.75rem 1.25rem;
+            border-radius: var(--radius-md);
+            text-decoration: none;
+            font-weight: 600;
+            transition: top var(--transition-fast);
+            box-shadow: var(--shadow-md);
+        }
+
+        .skip-link:focus {
+            top: 1rem;
+            outline: 3px solid var(--accent-secondary-glow);
+        }
+
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        /* Main Container */
+        .main-wrapper {
+            min-height: 100vh;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
         .header {
             text-align: center;
-            margin-bottom: 2rem;
+            margin-bottom: 1rem;
+            padding: 0.75rem;
             animation: fadeInDown 0.8s ease-out;
         }
 
+        .header-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-primary-hover));
+            border-radius: var(--radius-lg);
+            margin-bottom: 0.5rem;
+            box-shadow: 0 8px 32px var(--accent-primary-glow);
+        }
+
+        .header-icon svg {
+            width: 28px;
+            height: 28px;
+            fill: white;
+        }
+
         .header h1 {
-            font-size: 2.5rem;
+            font-size: 1.75rem;
             font-weight: 800;
             margin: 0;
-            background: linear-gradient(to right, var(--accent-blood), #fca5a5);
+            background: linear-gradient(135deg, #ffffff 0%, #e5e7eb 50%, var(--accent-primary) 100%);
             -webkit-background-clip: text;
             background-clip: text;
             -webkit-text-fill-color: transparent;
-            letter-spacing: -0.05em;
+            letter-spacing: -0.03em;
+            line-height: 1.2;
         }
 
         .header p {
             color: var(--text-muted);
-            font-size: 1.1rem;
-            margin-top: 0.5rem;
+            font-size: 0.9rem;
+            margin-top: 0.25rem;
+            font-weight: 400;
+            letter-spacing: 0.02em;
         }
 
+        /* Dashboard Container */
         .dashboard-container {
             display: grid;
-            grid-template-columns: 350px 1fr;
-            gap: 2rem;
+            grid-template-columns: 340px 1fr;
+            gap: 1.5rem;
             width: 100%;
-            max-width: 1200px;
+            max-width: 1400px;
+            margin: 0 auto;
+            flex: 1;
+            align-items: start;
+        }
+
+        /* Glass Card Base */
+        .glass-card {
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-lg);
+            transition: transform var(--transition-normal), box-shadow var(--transition-normal);
+        }
+
+        .glass-card:hover {
+            box-shadow: var(--shadow-glow);
         }
 
         /* Control Panel */
         .control-panel {
-            background-color: var(--panel-bg);
-            border-radius: var(--border-radius);
-            padding: 2rem;
-            box-shadow: var(--shadow);
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 1.25rem;
             animation: fadeInLeft 0.8s ease-out;
+            position: sticky;
+            top: 1rem;
         }
 
-        .control-panel h2 {
-            margin-top: 0;
-            font-size: 1.25rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            padding-bottom: 0.75rem;
+        .panel-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
             margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .panel-header-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--accent-secondary), var(--accent-secondary-hover));
+            border-radius: var(--radius-md);
+            box-shadow: 0 4px 16px var(--accent-secondary-glow);
+        }
+
+        .panel-header-icon svg {
+            width: 22px;
+            height: 22px;
+            fill: white;
+        }
+
+        .panel-header h2 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        #simulation-form {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        /* Input Groups */
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .input-group label {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-secondary);
             display: flex;
             align-items: center;
             gap: 0.5rem;
         }
 
-        .input-group {
-            margin-bottom: 1.25rem;
+        .label-icon {
+            width: 18px;
+            height: 18px;
+            opacity: 0.7;
         }
 
-        .input-group label {
-            display: block;
-            font-size: 0.875rem;
-            font-weight: 500;
+        .input-help {
+            font-size: 0.75rem;
             color: var(--text-muted);
-            margin-bottom: 0.5rem;
+            margin-top: 0.25rem;
+            padding-left: 1.75rem;
         }
 
-        .header-label {
-            display: flex;
-            justify-content: space-between;
+        /* Slider Container */
+        .slider-container {
+            background: var(--bg-glass-light);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            padding: 0.75rem;
+            transition: border-color var(--transition-fast), background var(--transition-fast);
+        }
+
+        .slider-container:hover,
+        .slider-container:focus-within {
+            border-color: var(--accent-secondary);
+            background: rgba(59, 130, 246, 0.05);
         }
 
         .slider-row {
             display: flex;
             align-items: center;
-            gap: 12px;
-            margin-top: 4px;
+            gap: 1rem;
         }
 
         .slider-row input[type="range"] {
-            flex-grow: 1;
-            width: 100%;
+            flex: 1;
             -webkit-appearance: none;
             appearance: none;
-            background: linear-gradient(to right, var(--accent-blue) 0%, var(--accent-blue) 50%, #e2e8f0 50%, #e2e8f0 100%);
-            height: 6px;
-            border-radius: 3px;
+            height: 8px;
+            background: var(--bg-tertiary);
+            border-radius: 4px;
             outline: none;
-            margin: 0;
             cursor: pointer;
+            transition: background var(--transition-fast);
         }
 
         .slider-row input[type="range"]::-webkit-slider-thumb {
             -webkit-appearance: none;
             appearance: none;
-            width: 16px;
-            height: 16px;
+            width: 20px;
+            height: 20px;
             border-radius: 50%;
-            background: var(--accent-blue);
+            background: linear-gradient(135deg, var(--accent-secondary), var(--accent-secondary-hover));
             cursor: pointer;
-            box-shadow: 0 0 0 2px var(--panel-bg);
+            box-shadow: 0 2px 8px var(--accent-secondary-glow);
+            transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+        }
+
+        .slider-row input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.15);
+            box-shadow: 0 4px 16px var(--accent-secondary-glow);
         }
 
         .slider-row input[type="range"]::-moz-range-thumb {
-            width: 16px;
-            height: 16px;
+            width: 20px;
+            height: 20px;
             border-radius: 50%;
-            background: var(--accent-blue);
+            background: linear-gradient(135deg, var(--accent-secondary), var(--accent-secondary-hover));
             cursor: pointer;
             border: none;
-            box-shadow: 0 0 0 2px var(--panel-bg);
+            box-shadow: 0 2px 8px var(--accent-secondary-glow);
         }
 
+        /* Value Display */
         .value-display {
-            font-weight: 700;
-            color: var(--accent-blue);
-        }
-
-        input.value-display {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 6px;
-            width: 44px;
-            height: 44px;
-            text-align: center;
-            padding: 0;
-            font-family: inherit;
-            font-size: 1rem;
+            width: 48px;
+            height: 48px;
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-subtle);
+            border-radius: var(--radius-md);
             display: flex;
             align-items: center;
             justify-content: center;
-            box-sizing: border-box;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: var(--accent-secondary);
+            text-align: center;
+            transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
         }
 
-        input.value-display::-webkit-outer-spin-button,
-        input.value-display::-webkit-inner-spin-button {
+        .value-display:focus {
+            outline: none;
+            border-color: var(--accent-secondary);
+            box-shadow: 0 0 0 4px var(--accent-secondary-glow);
+        }
+
+        .value-display::-webkit-outer-spin-button,
+        .value-display::-webkit-inner-spin-button {
             -webkit-appearance: none;
             margin: 0;
         }
 
-        input.value-display[type=number] {
+        .value-display[type=number] {
             -moz-appearance: textfield;
             appearance: textfield;
         }
 
-        /* Toggle specifically for ROP policy */
+        /* Policy Section */
         .policy-group {
-            margin-top: 2rem;
-            padding-top: 1.5rem;
-            border-top: 1px dashed rgba(255, 255, 255, 0.1);
+            margin-top: 0.5rem;
+            padding-top: 1rem;
+            border-top: 1px dashed var(--border-subtle);
         }
 
-        .checkbox-label {
+        #policy-inputs {
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            pointer-events: none;
+            transition: max-height 0.4s ease, opacity 0.3s ease, margin 0.3s ease;
+        }
+
+        #policy-inputs.expanded {
+            max-height: 400px;
+            opacity: 1;
+            pointer-events: all;
+            margin-top: 1rem;
+        }
+
+        /* Checkbox */
+        .checkbox-container {
             display: flex;
             align-items: center;
+            gap: 0.75rem;
+            padding: 1rem;
+            background: var(--bg-glass-light);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
             cursor: pointer;
-            font-size: 1rem;
+            transition: all var(--transition-fast);
+        }
+
+        .checkbox-container:hover {
+            border-color: var(--accent-primary);
+            background: rgba(239, 68, 68, 0.05);
+        }
+
+        .checkbox-container input[type="checkbox"] {
+            width: 22px;
+            height: 22px;
+            accent-color: var(--accent-primary);
+            cursor: pointer;
+        }
+
+        .checkbox-container span {
             font-weight: 600;
-            margin-bottom: 1rem;
+            color: var(--text-primary);
         }
 
-        .checkbox-label input {
-            width: 18px;
-            height: 18px;
-            margin-right: 10px;
-            accent-color: var(--accent-blood);
-        }
-
-        button {
+        /* Submit Button */
+        .submit-btn {
+            position: relative;
             width: 100%;
-            background: linear-gradient(135deg, var(--accent-blood), var(--accent-blood-hover));
+            padding: 1.1rem 1.5rem;
+            margin-top: 1rem;
+            background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-primary-hover) 100%);
             color: white;
             border: none;
-            padding: 1rem;
-            border-radius: 8px;
-            font-size: 1.1rem;
+            border-radius: var(--radius-md);
+            font-size: 1.05rem;
             font-weight: 700;
             cursor: pointer;
-            margin-top: 1.5rem;
-            transition: transform 0.2s, box-shadow 0.2s;
-            box-shadow: 0 4px 14px 0 rgba(239, 68, 68, 0.39);
+            overflow: hidden;
+            transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+            box-shadow: 0 4px 20px var(--accent-primary-glow);
         }
 
-        button:hover {
+        .submit-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .submit-btn:hover:not(:disabled) {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px 0 rgba(239, 68, 68, 0.5);
+            box-shadow: 0 8px 32px var(--accent-primary-glow);
         }
 
-        button:active {
+        .submit-btn:hover:not(:disabled)::before {
+            left: 100%;
+        }
+
+        .submit-btn:active:not(:disabled) {
             transform: translateY(0);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .submit-btn:focus-visible {
+            outline: 3px solid var(--accent-primary-glow);
+            outline-offset: 3px;
+        }
+
+        /* Status Message */
+        .status-message {
+            margin-top: 1rem;
+            padding: 0.875rem 1rem;
+            border-radius: var(--radius-md);
+            font-size: 0.875rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all var(--transition-normal);
+        }
+
+        .status-message::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: currentColor;
+            flex-shrink: 0;
+        }
+
+        .status-message.info {
+            background: var(--status-info-bg);
+            color: var(--accent-secondary);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .status-message.success {
+            background: var(--status-success-bg);
+            color: var(--accent-success);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .status-message.error {
+            background: var(--status-error-bg);
+            color: var(--accent-primary);
+            border: 1px solid rgba(239, 68, 68, 0.3);
         }
 
         /* Results Area */
         .results-area {
             display: flex;
             flex-direction: column;
-            gap: 2rem;
+            gap: 1.5rem;
             animation: fadeInRight 0.8s ease-out;
+            min-width: 0;
         }
 
+        /* KPI Grid */
         .kpi-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1.5rem;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
         }
 
         .kpi-card {
-            background-color: var(--panel-bg);
-            border-radius: var(--border-radius);
-            padding: 1.5rem;
-            box-shadow: var(--shadow);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            text-align: center;
-            transition: transform 0.3s ease;
+            padding: 1rem 1.25rem;
+            display: flex;
+            align-items: center;
+            text-align: left;
+            gap: 1rem;
+            position: relative;
+            overflow: hidden;
         }
 
-        .kpi-card:hover {
-            transform: translateY(-5px);
+        .kpi-content {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, currentColor, transparent);
+            opacity: 0.5;
+        }
+
+        .kpi-card-shortage { color: var(--accent-primary); }
+        .kpi-card-spoilage { color: var(--accent-warning); }
+        .kpi-card-service { color: var(--accent-success); }
+
+        .kpi-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 52px;
+            height: 52px;
+            border-radius: var(--radius-md);
+            margin-bottom: 0;
+            flex-shrink: 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        .kpi-icon::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: currentColor;
+            opacity: 0.15;
+            border-radius: inherit;
+            z-index: -1;
+        }
+
+        .kpi-icon svg {
+            width: 24px;
+            height: 24px;
+            fill: currentColor;
+            opacity: 1;
         }
 
         .kpi-card h3 {
-            margin: 0;
-            font-size: 0.875rem;
+            font-size: 0.75rem;
+            font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.08em;
             color: var(--text-muted);
+            margin-bottom: 0.25rem;
         }
 
         .kpi-value {
-            font-size: 2.5rem;
+            font-size: 1.75rem;
             font-weight: 800;
-            margin: 0.5rem 0 0.25rem 0;
+            line-height: 1.1;
+            margin-bottom: 0.15rem;
         }
 
         .kpi-subtext {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             color: var(--text-muted);
+            font-weight: 500;
         }
 
-        /* Specific KPI Colors */
-        .kpi-shortage .kpi-value {
-            color: var(--accent-blood);
-        }
-
-        .kpi-spoilage .kpi-value {
-            color: #f59e0b;
-        }
-
-        /* Warning Orange */
-        .kpi-service .kpi-value {
-            color: var(--accent-success);
-        }
-
-
+        /* Chart Container */
         .chart-container {
-            background-color: var(--panel-bg);
-            border-radius: var(--border-radius);
-            padding: 2rem;
-            box-shadow: var(--shadow);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            height: 400px;
+            padding: 1.25rem;
+            position: relative;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 550px;
+        }
+
+        .chart-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .chart-header-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--accent-success), var(--accent-secondary));
+            border-radius: var(--radius-sm);
+        }
+
+        .chart-header-icon svg {
+            width: 20px;
+            height: 20px;
+            fill: white;
+        }
+
+        .chart-header h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .chart-caption {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            margin-bottom: 1rem;
+            padding: 0.75rem;
+            background: var(--bg-glass-light);
+            border-radius: var(--radius-sm);
+            border-left: 3px solid var(--accent-secondary);
+        }
+
+        .chart-wrapper {
+            flex: 1;
             position: relative;
         }
 
+        /* Loading Overlay */
         .loading-overlay {
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(30, 41, 59, 0.8);
+            background: rgba(10, 15, 26, 0.85);
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
-            border-radius: var(--border-radius);
-            backdrop-filter: blur(4px);
+            gap: 1rem;
+            border-radius: var(--radius-xl);
+            backdrop-filter: blur(8px);
             opacity: 0;
             pointer-events: none;
-            transition: opacity 0.3s ease;
+            transition: opacity var(--transition-normal);
             z-index: 10;
         }
 
@@ -330,26 +723,30 @@
         }
 
         .spinner {
-            width: 50px;
-            height: 50px;
-            border: 5px solid rgba(239, 68, 68, 0.3);
-            border-top-color: var(--accent-blood);
+            width: 48px;
+            height: 48px;
+            border: 4px solid rgba(239, 68, 68, 0.2);
+            border-top-color: var(--accent-primary);
             border-radius: 50%;
-            animation: spin 1s infinite linear;
+            animation: spin 1s linear infinite;
         }
 
+        .loading-text {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        /* Animations */
         @keyframes spin {
-            100% {
-                transform: rotate(360deg);
-            }
+            100% { transform: rotate(360deg); }
         }
 
         @keyframes fadeInDown {
             from {
                 opacity: 0;
-                transform: translateY(-20px);
+                transform: translateY(-30px);
             }
-
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -359,9 +756,8 @@
         @keyframes fadeInLeft {
             from {
                 opacity: 0;
-                transform: translateX(-20px);
+                transform: translateX(-30px);
             }
-
             to {
                 opacity: 1;
                 transform: translateX(0);
@@ -371,176 +767,402 @@
         @keyframes fadeInRight {
             from {
                 opacity: 0;
-                transform: translateX(20px);
+                transform: translateX(30px);
             }
-
             to {
                 opacity: 1;
                 transform: translateX(0);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Focus Styles */
+        *:focus-visible {
+            outline: 3px solid var(--accent-secondary-glow);
+            outline-offset: 2px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .dashboard-container {
+                grid-template-columns: 300px 1fr;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .dashboard-container {
+                grid-template-columns: 1fr;
+            }
+
+            .kpi-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-wrapper {
+                padding: 0.75rem;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .kpi-grid {
+                grid-template-columns: 1fr;
+                gap: 0.5rem;
+            }
+
+            .kpi-card {
+                padding: 1rem;
+            }
+
+            .kpi-value {
+                font-size: 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.25rem;
+            }
+
+            .header p {
+                font-size: 0.8rem;
+            }
+
+            .control-panel,
+            .chart-container {
+                padding: 1rem;
+            }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* High Contrast Mode */
+        @media (prefers-contrast: high) {
+            :root {
+                --border-light: rgba(255, 255, 255, 0.3);
+                --text-muted: #d1d5db;
             }
         }
     </style>
 </head>
 
 <body>
+    <div class="background-gradient"></div>
+    
+    <a class="skip-link" href="#main-dashboard">Skip to dashboard controls</a>
 
-    <div class="header">
-        <h1>Lakano's Medical Center Blood Bank</h1>
-        <p>Monte Carlo Analysis for Inventory Optimization</p>
-    </div>
-
-    <div class="dashboard-container">
-
-        <!-- CONTROL PANEL -->
-        <div class="control-panel">
-            <h2>⚙️ System Parameters</h2>
-
-            <div class="input-group">
-                <div class="header-label">
-                    <label>Average Daily Donations</label>
-                </div>
-                <div class="slider-row">
-                    <input type="range" id="avg-donations" min="1" max="50" value="10"
-                        oninput="document.getElementById('val-donations').value = this.value; updateSliderFill(this)">
-                    <input type="number" class="value-display" id="val-donations" value="10"
-                        oninput="document.getElementById('avg-donations').value = this.value; updateSliderFill(document.getElementById('avg-donations'))">
-                </div>
+    <div class="main-wrapper">
+        <header class="header">
+            <div class="header-icon">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                </svg>
             </div>
+            <h1>Medical Center Blood Bank</h1>
+            <p>Monte Carlo Analysis for Inventory Optimization</p>
+        </header>
 
-            <div class="input-group">
-                <div class="header-label">
-                    <label>Avg. Scheduled Operations (Demand)</label>
+        <main class="dashboard-container" id="main-dashboard">
+            <!-- CONTROL PANEL -->
+            <section class="control-panel glass-card" aria-labelledby="parameters-title">
+                <div class="panel-header">
+                    <div class="panel-header-icon">
+                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3 17v2h6v-2H3zM3 5v2h10V5H3zm10 16v-2h8v-2h-8v-2h-2v6h2zM7 9v2H3v2h4v2h2V9H7zm14 4v-2H11v2h10zm-6-4h2V7h4V5h-4V3h-2v6z"/>
+                        </svg>
+                    </div>
+                    <h2 id="parameters-title">System Parameters</h2>
                 </div>
-                <div class="slider-row">
-                    <input type="range" id="avg-sched" min="1" max="40" value="7"
-                        oninput="document.getElementById('val-sched').value = this.value; updateSliderFill(this)">
-                    <input type="number" class="value-display" id="val-sched" value="7"
-                        oninput="document.getElementById('avg-sched').value = this.value; updateSliderFill(document.getElementById('avg-sched'))">
-                </div>
-            </div>
 
-            <div class="input-group">
-                <div class="header-label">
-                    <label>Avg. Emergency Trauma (Priority Demand)</label>
-                </div>
-                <div class="slider-row">
-                    <input type="range" id="avg-emer" min="0" max="20" value="3"
-                        oninput="document.getElementById('val-emer').value = this.value; updateSliderFill(this)">
-                    <input type="number" class="value-display" id="val-emer" value="3"
-                        oninput="document.getElementById('avg-emer').value = this.value; updateSliderFill(document.getElementById('avg-emer'))">
-                </div>
-            </div>
-
-            <div class="input-group">
-                <div class="header-label">
-                    <label>Maximum Shelf Life (Days)</label>
-                </div>
-                <div class="slider-row">
-                    <input type="range" id="max-life" min="15" max="60" value="35"
-                        oninput="document.getElementById('val-life').value = this.value; updateSliderFill(this)">
-                    <input type="number" class="value-display" id="val-life" value="35"
-                        oninput="document.getElementById('max-life').value = this.value; updateSliderFill(document.getElementById('max-life'))">
-                </div>
-            </div>
-
-            <div class="policy-group">
-                <label class="checkbox-label">
-                    <input type="checkbox" id="use-policy"> Enable Inventory Policy
-                </label>
-
-                <div id="policy-inputs" style="opacity: 0.5; pointer-events: none; transition: 0.3s;">
+                <form id="simulation-form" novalidate>
                     <div class="input-group">
-                        <div class="header-label">
-                            <label>Reorder Point (ROP)</label>
+                        <label for="avg-donations">
+                            <svg class="label-icon" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                            </svg>
+                            Average Daily Donations
+                        </label>
+                        <div class="slider-container">
+                            <div class="slider-row">
+                                <input type="range" id="avg-donations" min="1" max="50" value="10" aria-describedby="help-donations">
+                                <label for="val-donations" class="sr-only">Average daily donations value</label>
+                                <input type="number" class="value-display" id="val-donations" value="10" min="1" max="50" step="1" inputmode="numeric">
+                            </div>
                         </div>
-                        <div class="slider-row">
-                            <input type="range" id="input-rop" min="5" max="100" value="15"
-                                oninput="document.getElementById('val-rop').value = this.value; updateSliderFill(this)">
-                            <input type="number" class="value-display" id="val-rop" value="15"
-                                oninput="document.getElementById('input-rop').value = this.value; updateSliderFill(document.getElementById('input-rop'))">
-                        </div>
+                        <p class="input-help" id="help-donations">Estimated units donated each day</p>
                     </div>
 
                     <div class="input-group">
-                        <div class="header-label">
-                            <label>Order Quantity (Emergency Drive)</label>
+                        <label for="avg-sched">
+                            <svg class="label-icon" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM9 10H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm-8 4H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2z"/>
+                            </svg>
+                            Avg. Scheduled Operations
+                        </label>
+                        <div class="slider-container">
+                            <div class="slider-row">
+                                <input type="range" id="avg-sched" min="1" max="40" value="7" aria-describedby="help-sched">
+                                <label for="val-sched" class="sr-only">Scheduled operations demand value</label>
+                                <input type="number" class="value-display" id="val-sched" value="7" min="1" max="40" step="1" inputmode="numeric">
+                            </div>
                         </div>
-                        <div class="slider-row">
-                            <input type="range" id="input-oq" min="1" max="50" value="10"
-                                oninput="document.getElementById('val-oq').value = this.value; updateSliderFill(this)">
-                            <input type="number" class="value-display" id="val-oq" value="10"
-                                oninput="document.getElementById('input-oq').value = this.value; updateSliderFill(document.getElementById('input-oq'))">
+                        <p class="input-help" id="help-sched">Average planned transfusions requested each day</p>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="avg-emer">
+                            <svg class="label-icon" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 2L1 21h22L12 2zm0 3.99L19.53 19H4.47L12 5.99zM11 10v4h2v-4h-2zm0 6v2h2v-2h-2z"/>
+                            </svg>
+                            Avg. Emergency Trauma
+                        </label>
+                        <div class="slider-container">
+                            <div class="slider-row">
+                                <input type="range" id="avg-emer" min="0" max="20" value="3" aria-describedby="help-emer">
+                                <label for="val-emer" class="sr-only">Emergency trauma demand value</label>
+                                <input type="number" class="value-display" id="val-emer" value="3" min="0" max="20" step="1" inputmode="numeric">
+                            </div>
+                        </div>
+                        <p class="input-help" id="help-emer">Urgent transfusion requests from emergencies</p>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="max-life">
+                            <svg class="label-icon" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
+                            </svg>
+                            Maximum Shelf Life
+                        </label>
+                        <div class="slider-container">
+                            <div class="slider-row">
+                                <input type="range" id="max-life" min="15" max="60" value="35" aria-describedby="help-life">
+                                <label for="val-life" class="sr-only">Maximum shelf life in days value</label>
+                                <input type="number" class="value-display" id="val-life" value="35" min="15" max="60" step="1" inputmode="numeric">
+                            </div>
+                        </div>
+                        <p class="input-help" id="help-life">Shelf life before an unused blood unit expires</p>
+                    </div>
+
+                    <div class="policy-group">
+                        <label class="checkbox-container" for="use-policy">
+                            <input type="checkbox" id="use-policy" aria-controls="policy-inputs" aria-expanded="false">
+                            <span>Enable Inventory Policy</span>
+                        </label>
+
+                        <div id="policy-inputs" role="group" aria-label="Inventory policy settings" aria-hidden="true">
+                            <div class="input-group">
+                                <label for="input-rop">
+                                    <svg class="label-icon" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+                                    </svg>
+                                    Reorder Point (ROP)
+                                </label>
+                                <div class="slider-container">
+                                    <div class="slider-row">
+                                        <input type="range" id="input-rop" min="5" max="100" value="15" aria-describedby="help-rop">
+                                        <label for="val-rop" class="sr-only">Reorder point value</label>
+                                        <input type="number" class="value-display" id="val-rop" value="15" min="5" max="100" step="1" inputmode="numeric">
+                                    </div>
+                                </div>
+                                <p class="input-help" id="help-rop">Trigger replenishment when stock reaches this level</p>
+                            </div>
+
+                            <div class="input-group">
+                                <label for="input-oq">
+                                    <svg class="label-icon" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M19 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/>
+                                    </svg>
+                                    Order Quantity
+                                </label>
+                                <div class="slider-container">
+                                    <div class="slider-row">
+                                        <input type="range" id="input-oq" min="1" max="50" value="10" aria-describedby="help-oq">
+                                        <label for="val-oq" class="sr-only">Order quantity value</label>
+                                        <input type="number" class="value-display" id="val-oq" value="10" min="1" max="50" step="1" inputmode="numeric">
+                                    </div>
+                                </div>
+                                <p class="input-help" id="help-oq">Units ordered each time reorder point is reached</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button id="run-simulation-btn" class="submit-btn" type="submit">
+                        Run Simulation (1 Year)
+                    </button>
+                    <p id="form-status" class="status-message info" role="status" aria-live="polite">
+                        Ready. Configure values and run the simulation.
+                    </p>
+                </form>
+            </section>
+
+            <!-- RESULTS AREA -->
+            <section class="results-area" aria-label="Simulation results">
+                <div class="kpi-grid">
+                    <div class="kpi-card glass-card kpi-card-shortage">
+                        <div class="kpi-icon">
+                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+                            </svg>
+                        </div>
+                        <div class="kpi-content">
+                            <h3>Total Annual Shortages</h3>
+                            <div class="kpi-value" id="kpi-shortage" aria-live="polite">--</div>
+                            <div class="kpi-subtext">Patients unable to receive blood</div>
+                        </div>
+                    </div>
+
+                    <div class="kpi-card glass-card kpi-card-spoilage">
+                        <div class="kpi-icon">
+                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
+                            </svg>
+                        </div>
+                        <div class="kpi-content">
+                            <h3>Spoiled Units</h3>
+                            <div class="kpi-value" id="kpi-spoilage" aria-live="polite">--</div>
+                            <div class="kpi-subtext">Blood expired before use</div>
+                        </div>
+                    </div>
+
+                    <div class="kpi-card glass-card kpi-card-service">
+                        <div class="kpi-icon">
+                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                            </svg>
+                        </div>
+                        <div class="kpi-content">
+                            <h3>Service Level</h3>
+                            <div class="kpi-value" id="kpi-service" aria-live="polite">--%</div>
+                            <div class="kpi-subtext">Percentage of all demand met</div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <button onclick="runSimulation()">▶️ Run Simulation (1 Year)</button>
-        </div>
-
-        <!-- RESULTS AREA -->
-        <div class="results-area">
-
-            <div class="kpi-grid">
-                <div class="kpi-card kpi-shortage">
-                    <h3>Total Annual Shortages</h3>
-                    <div class="kpi-value" id="kpi-shortage">--</div>
-                    <div class="kpi-subtext">Patients unable to receive blood</div>
+                <div class="chart-container glass-card">
+                    <div class="loading-overlay" id="loading" role="status" aria-live="polite" aria-label="Simulation in progress" aria-hidden="true">
+                        <div class="spinner" aria-hidden="true"></div>
+                        <span class="loading-text">Running simulation...</span>
+                    </div>
+                    
+                    <div class="chart-header">
+                        <div class="chart-header-icon">
+                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M5 9.2h3V19H5V9.2zM10.6 5h2.8v14h-2.8V5zm5.6 8H19v6h-2.8v-6z"/>
+                            </svg>
+                        </div>
+                        <h3>Annual Trade-off Analysis</h3>
+                    </div>
+                    
+                    <p id="chart-summary" class="chart-caption">Run a simulation to populate the chart and KPI cards.</p>
+                    
+                    <div class="chart-wrapper">
+                        <canvas id="resultsChart" role="img" aria-label="Bar chart showing emergency shortages, scheduled shortages, and total spoilage"></canvas>
+                    </div>
                 </div>
-
-                <div class="kpi-card kpi-spoilage">
-                    <h3>Spoiled Units</h3>
-                    <div class="kpi-value" id="kpi-spoilage">--</div>
-                    <div class="kpi-subtext">Blood expired before use</div>
-                </div>
-
-                <div class="kpi-card kpi-service">
-                    <h3>Service Level</h3>
-                    <div class="kpi-value" id="kpi-service">--%</div>
-                    <div class="kpi-subtext">Percentage of all demand met</div>
-                </div>
-            </div>
-
-            <div class="chart-container">
-                <div class="loading-overlay" id="loading">
-                    <div class="spinner"></div>
-                </div>
-                <canvas id="resultsChart"></canvas>
-            </div>
-
-        </div>
+            </section>
+        </main>
     </div>
 
     <script>
-        // Dynamic Slider Fill Function
+        const simulationForm = document.getElementById('simulation-form');
+        const runButton = document.getElementById('run-simulation-btn');
+        const statusMessage = document.getElementById('form-status');
+        const loadingOverlay = document.getElementById('loading');
+        const chartSummary = document.getElementById('chart-summary');
+        const policyToggle = document.getElementById('use-policy');
+        const policyPanel = document.getElementById('policy-inputs');
+
         function updateSliderFill(slider) {
             const min = slider.min ? parseFloat(slider.min) : 0;
             const max = slider.max ? parseFloat(slider.max) : 100;
             const val = parseFloat(slider.value);
             const percentage = ((val - min) / (max - min)) * 100;
-            slider.style.background = `linear-gradient(to right, var(--accent-blue) 0%, var(--accent-blue) ${percentage}%, #e2e8f0 ${percentage}%, #e2e8f0 100%)`;
+            slider.style.background =
+                `linear-gradient(to right, var(--accent-secondary) 0%, var(--accent-secondary) ${percentage}%, var(--bg-tertiary) ${percentage}%, var(--bg-tertiary) 100%)`;
         }
 
-        // Initialize all slider fills
-        document.querySelectorAll('input[type="range"]').forEach(slider => {
-            updateSliderFill(slider);
-        });
+        function clampToRange(value, min, max) {
+            const parsed = parseInt(value, 10);
+            if (Number.isNaN(parsed)) return min;
+            return Math.min(max, Math.max(min, parsed));
+        }
 
-        // Toggle Policy Inputs
-        document.getElementById('use-policy').addEventListener('change', function () {
-            const panel = document.getElementById('policy-inputs');
-            if (this.checked) {
-                panel.style.opacity = '1';
-                panel.style.pointerEvents = 'all';
-            } else {
-                panel.style.opacity = '0.5';
-                panel.style.pointerEvents = 'none';
-            }
+        function bindSliderPair(sliderId, numberId) {
+            const slider = document.getElementById(sliderId);
+            const number = document.getElementById(numberId);
+            const min = parseInt(slider.min, 10);
+            const max = parseInt(slider.max, 10);
+
+            const syncFromSlider = () => {
+                number.value = slider.value;
+                updateSliderFill(slider);
+            };
+
+            const syncFromNumber = () => {
+                const clamped = clampToRange(number.value, min, max);
+                number.value = clamped;
+                slider.value = clamped;
+                updateSliderFill(slider);
+            };
+
+            slider.addEventListener('input', syncFromSlider);
+            number.addEventListener('input', syncFromNumber);
+            number.addEventListener('blur', syncFromNumber);
+
+            syncFromSlider();
+        }
+
+        [
+            ['avg-donations', 'val-donations'],
+            ['avg-sched', 'val-sched'],
+            ['avg-emer', 'val-emer'],
+            ['max-life', 'val-life'],
+            ['input-rop', 'val-rop'],
+            ['input-oq', 'val-oq']
+        ].forEach(([sliderId, numberId]) => bindSliderPair(sliderId, numberId));
+
+        function setPolicyInputsEnabled(enabled) {
+            policyPanel.classList.toggle('expanded', enabled);
+            policyPanel.setAttribute('aria-hidden', String(!enabled));
+            policyToggle.setAttribute('aria-expanded', String(enabled));
+            policyPanel.querySelectorAll('input').forEach(input => {
+                input.disabled = !enabled;
+            });
+        }
+
+        policyToggle.addEventListener('change', () => {
+            setPolicyInputsEnabled(policyToggle.checked);
         });
+        setPolicyInputsEnabled(policyToggle.checked);
+
+        function setStatus(message, tone = 'info') {
+            statusMessage.textContent = message;
+            statusMessage.classList.remove('success', 'error', 'info');
+            statusMessage.classList.add(tone);
+        }
+
+        const localHostNames = new Set(['127.0.0.1', 'localhost']);
+        const apiBase = (localHostNames.has(window.location.hostname) && window.location.port === '8080')
+            ? ''
+            : 'http://127.0.0.1:8080';
 
         // Initialize Chart.js
         const ctx = document.getElementById('resultsChart').getContext('2d');
-        let resultsChart = new Chart(ctx, {
+        const resultsChart = new Chart(ctx, {
             type: 'bar',
             data: {
                 labels: ['Emergency Shortages', 'Scheduled Shortages', 'Total Spoilage'],
@@ -548,83 +1170,124 @@
                     label: 'Units Per Year',
                     data: [0, 0, 0],
                     backgroundColor: [
-                        'rgba(239, 68, 68, 0.8)',   // Red for Emergency Shortage
-                        'rgba(245, 158, 11, 0.8)',  // Orange for Scheduled Shortage
-                        'rgba(148, 163, 184, 0.8)'  // Gray for Spoilage
+                        'rgba(239, 68, 68, 0.85)',
+                        'rgba(245, 158, 11, 0.85)',
+                        'rgba(156, 163, 175, 0.85)'
+                    ],
+                    hoverBackgroundColor: [
+                        'rgba(239, 68, 68, 1)',
+                        'rgba(245, 158, 11, 1)',
+                        'rgba(156, 163, 175, 1)'
                     ],
                     borderWidth: 0,
-                    borderRadius: 6
+                    borderRadius: 8,
+                    borderSkipped: false
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                animation: {
+                    duration: 800,
+                    easing: 'easeOutQuart'
+                },
                 plugins: {
                     legend: { display: false },
                     title: {
                         display: true,
-                        text: 'Annual Trade-off: Shortage vs. Spoilage',
-                        color: '#f8fafc',
-                        font: { size: 16, family: 'Inter', weight: 'bold' }
+                        text: 'Shortage vs. Spoilage Analysis',
+                        color: '#f9fafb',
+                        font: { 
+                            size: 15, 
+                            family: 'Inter', 
+                            weight: '700',
+                            lineHeight: 1.4
+                        },
+                        padding: { bottom: 20 }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(17, 24, 39, 0.95)',
+                        titleColor: '#f9fafb',
+                        bodyColor: '#e5e7eb',
+                        borderColor: 'rgba(255, 255, 255, 0.1)',
+                        borderWidth: 1,
+                        cornerRadius: 8,
+                        padding: 12,
+                        titleFont: { weight: '600' }
                     }
                 },
                 scales: {
                     y: {
-                        grid: { color: 'rgba(255, 255, 255, 0.05)' },
-                        ticks: { color: '#94a3b8' }
+                        beginAtZero: true,
+                        grid: { 
+                            color: 'rgba(255, 255, 255, 0.06)',
+                            drawBorder: false
+                        },
+                        ticks: { 
+                            color: '#9ca3af',
+                            font: { size: 12, weight: '500' },
+                            padding: 8
+                        }
                     },
                     x: {
                         grid: { display: false },
-                        ticks: { color: '#e2e8f0', font: { weight: '600' } }
+                        ticks: { 
+                            color: '#e5e7eb', 
+                            font: { size: 12, weight: '600' },
+                            padding: 8
+                        }
                     }
                 }
             }
         });
 
-        // Fetch mechanism
-        async function runSimulation() {
-            // Show loading
-            document.getElementById('loading').classList.add('active');
-
-            // Gather inputs
+        function buildPayload() {
             const payload = {
-                replications: 1, // Changed to 1 year
+                replications: 1,
                 days: 365,
-                max_shelf_life: parseInt(document.getElementById('val-life').value),
-                avg_donations: parseInt(document.getElementById('val-donations').value),
-                avg_sched_demand: parseInt(document.getElementById('val-sched').value),
-                avg_emer_demand: parseInt(document.getElementById('val-emer').value),
+                max_shelf_life: parseInt(document.getElementById('val-life').value, 10),
+                avg_donations: parseInt(document.getElementById('val-donations').value, 10),
+                avg_sched_demand: parseInt(document.getElementById('val-sched').value, 10),
+                avg_emer_demand: parseInt(document.getElementById('val-emer').value, 10)
             };
 
-            if (document.getElementById('use-policy').checked) {
-                payload.reorder_point = parseInt(document.getElementById('val-rop').value);
-                payload.order_quantity = parseInt(document.getElementById('val-oq').value);
+            if (policyToggle.checked) {
+                payload.reorder_point = parseInt(document.getElementById('val-rop').value, 10);
+                payload.order_quantity = parseInt(document.getElementById('val-oq').value, 10);
             }
 
+            return payload;
+        }
+
+        async function runSimulation() {
+            runButton.disabled = true;
+            loadingOverlay.classList.add('active');
+            loadingOverlay.setAttribute('aria-hidden', 'false');
+            setStatus('Running simulation. Please wait...', 'info');
+            chartSummary.textContent = 'Simulation in progress...';
+
             try {
-                const response = await fetch('http://127.0.0.1:8080/simulate', {
+                const response = await fetch(`${apiBase}/simulate`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
+                    body: JSON.stringify(buildPayload())
                 });
 
-                const data = await response.json();
+                if (!response.ok) {
+                    throw new Error(`Request failed with status ${response.status}`);
+                }
 
-                // Update KPIs
-                // document.getElementById('kpi-shortage').innerText = data.total_shortages.toFixed(1);
-                // Animate numbers
-                animateValue("kpi-shortage", data.total_shortages.toFixed(1));
-                animateValue("kpi-spoilage", data.total_spoilage.toFixed(1));
+                const data = await response.json();
+                animateValue('kpi-shortage', data.total_shortages.toFixed(1));
+                animateValue('kpi-spoilage', data.total_spoilage.toFixed(1));
 
                 const serviceElement = document.getElementById('kpi-service');
-                serviceElement.innerText = data.service_level.toFixed(2) + '%';
+                serviceElement.textContent = `${data.service_level.toFixed(2)}%`;
 
-                // Color code the service level
                 if (data.service_level >= 99) serviceElement.style.color = 'var(--accent-success)';
                 else if (data.service_level >= 95) serviceElement.style.color = '#f59e0b';
-                else serviceElement.style.color = 'var(--accent-blood)';
+                else serviceElement.style.color = 'var(--accent-primary)';
 
-                // Update Chart
                 resultsChart.data.datasets[0].data = [
                     data.emergency_shortages,
                     data.scheduled_shortages,
@@ -632,23 +1295,30 @@
                 ];
                 resultsChart.update();
 
+                chartSummary.textContent = `Emergency shortages: ${data.emergency_shortages.toFixed(1)}, `
+                    + `scheduled shortages: ${data.scheduled_shortages.toFixed(1)}, `
+                    + `spoilage: ${data.total_spoilage.toFixed(1)} units.`;
+                setStatus('Simulation completed successfully.', 'success');
             } catch (err) {
-                console.error("Simulation failed:", err);
-                alert("Failed to connect to the simulation engine. Ensure api.py is running on port 8000.");
+                console.error('Simulation failed:', err);
+                chartSummary.textContent = 'No chart update. Connect the API and run simulation again.';
+                setStatus('Unable to run simulation. Ensure api.py is running on port 8080.', 'error');
             } finally {
-                // Hide loading
-                document.getElementById('loading').classList.remove('active');
+                loadingOverlay.classList.remove('active');
+                loadingOverlay.setAttribute('aria-hidden', 'true');
+                runButton.disabled = false;
             }
         }
 
         function animateValue(id, end) {
             const obj = document.getElementById(id);
-            obj.innerHTML = end;
+            obj.textContent = end;
         }
 
-        // Run once on load to show a baseline
-        setTimeout(runSimulation, 500);
-
+        simulationForm.addEventListener('submit', event => {
+            event.preventDefault();
+            runSimulation();
+        });
     </script>
 </body>
 

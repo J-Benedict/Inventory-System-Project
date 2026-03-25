@@ -1,11 +1,15 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse, Response
 from pydantic import BaseModel
+from pathlib import Path
 from typing import Optional
 import uvicorn
 from monte_carlo import run_monte_carlo
 
 app = FastAPI(title="Blood Bank Simulation API")
+BASE_DIR = Path(__file__).resolve().parent
+INDEX_HTML = BASE_DIR / "index.html"
 
 # Essential for allowing our frontend to talk to this backend
 app.add_middleware(
@@ -15,6 +19,22 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.get("/")
+async def serve_frontend():
+    """
+    Serve the dashboard page directly from the API host.
+    """
+    return FileResponse(INDEX_HTML)
+
+
+@app.get("/favicon.ico")
+async def favicon():
+    """
+    Avoid noisy 404 logs when the browser requests a favicon.
+    """
+    return Response(status_code=204)
 
 class SimulationParams(BaseModel):
     replications: int = 100
