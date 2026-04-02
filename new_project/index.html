@@ -71,9 +71,11 @@
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             background: var(--bg-primary);
             color: var(--text-primary);
-            min-height: 100vh;
+            height: 100vh;
             line-height: 1.6;
-            overflow-x: hidden;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
         }
 
         /* Custom Scrollbar */
@@ -148,10 +150,11 @@
 
         /* Main Container */
         .main-wrapper {
-            min-height: 100vh;
+            height: 100vh;
             padding: 1rem;
             display: flex;
             flex-direction: column;
+            overflow: hidden;
         }
 
         /* Header */
@@ -206,10 +209,13 @@
             grid-template-columns: 340px 1fr;
             gap: 1.5rem;
             width: 100%;
-            max-width: 1400px;
+            max-width: 1500px;
             margin: 0 auto;
             flex: 1;
-            align-items: start;
+            height: 100%;
+            overflow: hidden;
+            min-height: 0;
+            padding-bottom: 0.5rem;
         }
 
         /* Glass Card Base */
@@ -231,17 +237,61 @@
         .control-panel {
             padding: 1.25rem;
             animation: fadeInLeft 0.8s ease-out;
-            position: sticky;
-            top: 1rem;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            height: 100%;
+        }
+
+        #simulation-form {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding-bottom: 1rem;
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none;  /* Internet Explorer 10+ */
+        }
+        
+        #simulation-form::-webkit-scrollbar { 
+            display: none;  /* Safari and Chrome */
         }
 
         .panel-header {
             display: flex;
             align-items: center;
+            justify-content: space-between;
             gap: 0.75rem;
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            margin-bottom: 1rem;
             border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .icon-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-sm);
+            color: var(--text-secondary);
+            cursor: pointer;
+            width: 32px;
+            height: 32px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all var(--transition-fast);
+        }
+        .icon-btn:hover {
+            color: var(--accent-secondary);
+            border-color: var(--accent-secondary);
+            background: rgba(59, 130, 246, 0.1);
+            transform: rotate(-30deg) scale(1.1);
+        }
+        .icon-btn svg {
+            width: 18px;
+            height: 18px;
+            fill: currentColor;
         }
 
         .panel-header-icon {
@@ -297,10 +347,7 @@
         }
 
         .input-help {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            margin-top: 0.25rem;
-            padding-left: 1.75rem;
+            display: none;
         }
 
         /* Slider Container */
@@ -409,14 +456,17 @@
             overflow: hidden;
             opacity: 0;
             pointer-events: none;
-            transition: max-height 0.4s ease, opacity 0.3s ease, margin 0.3s ease;
+            transition: max-height 0.3s ease, opacity 0.3s ease, margin 0.3s ease;
         }
 
         #policy-inputs.expanded {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
             max-height: 400px;
             opacity: 1;
             pointer-events: all;
-            margin-top: 1rem;
+            margin-top: 0.75rem;
         }
 
         /* Checkbox */
@@ -463,6 +513,7 @@
             font-weight: 700;
             cursor: pointer;
             overflow: hidden;
+            flex-shrink: 0;
             transition: transform var(--transition-fast), box-shadow var(--transition-fast);
             box-shadow: 0 4px 20px var(--accent-primary-glow);
         }
@@ -549,6 +600,8 @@
             gap: 1.5rem;
             animation: fadeInRight 0.8s ease-out;
             min-width: 0;
+            overflow: hidden;
+            min-height: 0;
         }
 
         /* KPI Grid */
@@ -648,7 +701,8 @@
             flex: 1;
             display: flex;
             flex-direction: column;
-            min-height: 550px;
+            min-height: 0;
+            overflow: hidden;
         }
 
         .chart-header {
@@ -866,26 +920,28 @@
     <a class="skip-link" href="#main-dashboard">Skip to dashboard controls</a>
 
     <div class="main-wrapper">
-        <header class="header">
-            <div class="header-icon">
-                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                </svg>
-            </div>
-            <h1>Medical Center Blood Bank</h1>
-            <p>Monte Carlo Analysis for Inventory Optimization</p>
-        </header>
-
         <main class="dashboard-container" id="main-dashboard">
             <!-- CONTROL PANEL -->
             <section class="control-panel glass-card" aria-labelledby="parameters-title">
-                <div class="panel-header">
-                    <div class="panel-header-icon">
-                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M3 17v2h6v-2H3zM3 5v2h10V5H3zm10 16v-2h8v-2h-8v-2h-2v6h2zM7 9v2H3v2h4v2h2V9H7zm14 4v-2H11v2h10zm-6-4h2V7h4V5h-4V3h-2v6z"/>
-                        </svg>
+                <header class="header" style="text-align: left; margin-bottom: 1.5rem; padding: 0;">
+                    <div style="display: flex; gap: 0.75rem; align-items: center; margin-bottom: 0.25rem;">
+                        <div class="header-icon" style="width: 32px; height: 32px; margin: 0; box-shadow: none; border-radius: var(--radius-sm)">
+                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                            </svg>
+                        </div>
+                        <h1 style="font-size: 1.25rem; margin: 0; text-align: left;">Medical Center Bank</h1>
                     </div>
-                    <h2 id="parameters-title">System Parameters</h2>
+                    <p style="font-size: 0.8rem; margin: 0;">Monte Carlo Analysis for Inventory Optimization</p>
+                </header>
+
+                <div class="panel-header">
+                    <h2 id="parameters-title" style="font-size: 1rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin: 0;">System Parameters</h2>
+                    <button type="button" id="reset-params-btn" class="icon-btn" aria-label="Reset Parameters" title="Reset all parameters to default">
+                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
+                        </svg>
+                    </button>
                 </div>
 
                 <form id="simulation-form" novalidate>
@@ -1134,6 +1190,30 @@
             ['input-rop', 'val-rop'],
             ['input-oq', 'val-oq']
         ].forEach(([sliderId, numberId]) => bindSliderPair(sliderId, numberId));
+
+        document.getElementById('reset-params-btn').addEventListener('click', () => {
+            const defaults = {
+                'val-donations': 10,
+                'val-sched': 7,
+                'val-emer': 3,
+                'val-life': 35,
+                'val-rop': 15,
+                'val-oq': 10
+            };
+            
+            for (const [id, value] of Object.entries(defaults)) {
+                const numInput = document.getElementById(id);
+                numInput.value = value;
+                const event = new Event('input', { bubbles: true });
+                numInput.dispatchEvent(event);
+            }
+            
+            if (policyToggle.checked) {
+                policyToggle.click();
+            }
+            
+            setStatus('Parameters reset to default.', 'info');
+        });
 
         function setPolicyInputsEnabled(enabled) {
             policyPanel.classList.toggle('expanded', enabled);
