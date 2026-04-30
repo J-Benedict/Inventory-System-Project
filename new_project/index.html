@@ -1114,13 +1114,21 @@
                         <span class="loading-text">Running simulation...</span>
                     </div>
                     
-                    <div class="chart-header">
-                        <div class="chart-header-icon">
-                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M5 9.2h3V19H5V9.2zM10.6 5h2.8v14h-2.8V5zm5.6 8H19v6h-2.8v-6z"/>
-                            </svg>
+                    <div class="chart-header" style="justify-content: space-between;">
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            <div class="chart-header-icon">
+                                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M5 9.2h3V19H5V9.2zM10.6 5h2.8v14h-2.8V5zm5.6 8H19v6h-2.8v-6z"/>
+                                </svg>
+                            </div>
+                            <h3>Annual Trade-off Analysis</h3>
                         </div>
-                        <h3>Annual Trade-off Analysis</h3>
+                        <button id="export-csv-btn" aria-label="Export Data" title="Export to CSV" style="margin-left: auto; width: auto; padding: 0.5rem 1rem; border-radius: var(--radius-sm); font-size: 0.8rem; background: var(--bg-glass-light); color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem; border: 1px solid var(--border-light); cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='var(--accent-secondary)'" onmouseout="this.style.background='var(--bg-glass-light)'">
+                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="width: 16px; height: 16px; fill: currentColor;">
+                                <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                            </svg>
+                            Export CSV
+                        </button>
                     </div>
                     
                     <p id="chart-summary" class="chart-caption">Run a simulation to populate the chart and KPI cards.</p>
@@ -1398,6 +1406,40 @@
         simulationForm.addEventListener('submit', event => {
             event.preventDefault();
             runSimulation();
+        });
+
+        document.getElementById('export-csv-btn').addEventListener('click', () => {
+            const data = [
+                ['Parameter', 'Value'],
+                ['Daily Donations', document.getElementById('val-donations').value],
+                ['Avg Scheduled Operations', document.getElementById('val-sched').value],
+                ['Avg Emergency Trauma', document.getElementById('val-emer').value],
+                ['Maximum Shelf Life', document.getElementById('val-life').value],
+                ['Reorder Point (if enabled)', document.getElementById('use-policy').checked ? document.getElementById('val-rop').value : 'N/A'],
+                ['Order Quantity (if enabled)', document.getElementById('use-policy').checked ? document.getElementById('val-oq').value : 'N/A'],
+                [],
+                ['Shortage vs Spoilage Analysis Result', 'Value'],
+                ['Total Annual Shortages', document.getElementById('kpi-shortage').textContent],
+                ['Spoiled Units', document.getElementById('kpi-spoilage').textContent],
+                ['Service Level', document.getElementById('kpi-service').textContent]
+            ];
+            
+            const chartData = resultsChart.data.datasets[0].data;
+            if (chartData && chartData.length === 3) {
+                data.push(['Emergency Shortages', chartData[0]]);
+                data.push(['Scheduled Shortages', chartData[1]]);
+                data.push(['Total Spoilage', chartData[2]]);
+            }
+
+            const csvContent = data.map(e => e.join(",")).join("\n");
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.setAttribute("href", url);
+            link.setAttribute("download", "shortage_vs_spoilage_analysis.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         });
     </script>
 </body>
